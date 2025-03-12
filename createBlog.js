@@ -52,6 +52,22 @@ async function fetchUsers() {
   }
 }
 
+// pagination
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    fetchUsers(currentPage);
+  }
+}
+
+function nextPage() {
+  if (currentPage < totalPages) {
+    currentPage++;
+    fetchUsers(currentPage);
+  }
+}
+
+
 // create a new blog post-----
 async function createBlogPost(evt) {
   evt.preventDefault();
@@ -242,47 +258,4 @@ async function editBlogPost(id, oldTitle, oldBody, blogPost) {
     },
   });
 }
-
-// Handle previous page
-function prevPage() {
-  if (currentPage > 1) {
-    currentPage--;
-    fetchUsers(currentPage);
-  }
-}
-
-// Handle next page
-function nextPage() {
-  if (currentPage < totalPages) {
-    currentPage++;
-    fetchUsers(currentPage);
-  }
-}
-
-
-
-// edit blogg
-// async function editBlogPost(id, oldTitle, oldBody, blogPost) {
-//   const newTitle = prompt("Enter new title:", oldTitle);
-//   const newBody = prompt("Enter new description:", oldBody);
-
-//   if (!newTitle || !newBody) return;
-
-//   try {
-//     await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-//       method: "PUT",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ title: newTitle, body: newBody, userId: 1 }),
-//     });
-
-//     alert("Blog post updated successfully!"); // Simple Success Message
-
-//     // **UI Update ✅**
-//     blogPost.querySelector("h2").textContent = newTitle;
-//     blogPost.querySelector("p").textContent = newBody;
-//   } catch (error) {
-//     alert("Failed to update the blog post."); // Error Message
-//   }
-// }
-
 
