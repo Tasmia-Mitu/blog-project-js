@@ -1,5 +1,5 @@
 let currentPage = 1;
-const limit = 8;
+const limit = 9;
 const totalPages = 5;
 
 async function fetchBlogs() {

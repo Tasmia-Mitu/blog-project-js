@@ -1,12 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
   fetchUsers();
+  updatePaginationButtons();
 
   const form = document.getElementById("create-post");
   form.addEventListener("submit", (evt) => createBlogPost(evt));
 
-  // // pagination--
-  // document.getElementById("prev-page").disabled = currentPage===1;
-  // document.getElementById("next-page").disabled = currentPage === totalPages;
+  // pagination--
+  document.getElementById("prev-page").addEventListener("click", prevPage);
+  document.getElementById("next-page").addEventListener("click", nextPage);
 
 });
 
@@ -40,11 +41,8 @@ async function fetchUsers() {
       displayBlogPost(blog.id, blog.title, blog.body, blogContainer);
     });
 
-    document.getElementById("current-page").textContent = currentPage;
-
     // Update disabled state for pagination buttons
-    document.getElementById("prev-page").disabled = currentPage === 1;
-    document.getElementById("next-page").disabled = currentPage === totalPages;
+    updatePaginationButtons();
 
   } catch (error) {
     console.error("Error fetching blog posts:", error);
@@ -52,18 +50,25 @@ async function fetchUsers() {
   }
 }
 
-// pagination
+// pagination function
+function updatePaginationButtons() {
+  document.getElementById("current-page").textContent = currentPage;
+  document.getElementById("prev-page").disabled = currentPage === 1;
+  document.getElementById("next-page").disabled = currentPage === totalPages;
+}
+
+// pagination handle
 function prevPage() {
   if (currentPage > 1) {
     currentPage--;
-    fetchUsers(currentPage);
+    fetchUsers();
   }
 }
 
 function nextPage() {
   if (currentPage < totalPages) {
     currentPage++;
-    fetchUsers(currentPage);
+    fetchUsers();
   }
 }
 
