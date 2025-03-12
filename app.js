@@ -1,10 +1,14 @@
+let currentPage = 1;
+const limit = 8;
+const totalPages = 5;
+
 async function fetchBlogs() {
   try {
     const response = await fetch("https://dev.to/api/articles");
     const blogs = await response.json();
 
     const blogContainer = document.getElementById("blog-container");
-    blogContainer.innerHTML = ""; 
+    blogContainer.innerHTML = "";
 
     blogContainer.classList.add(
       "grid",
@@ -15,10 +19,13 @@ async function fetchBlogs() {
       "p-5"
     );
 
-    // const isHomePage = window.location.pathname === "/index.html";  
+    // const isHomePage = window.location.pathname === "/index.html";
     // const blogsToDisplay = isHomePage ? blogs.slice(0, 6) : blogs;
 
-    blogs.forEach((blog) => {
+    const start = (currentPage - 1) * limit;
+    const end = currentPage * limit;
+
+    blogs.slice(start, end).forEach((blog) => {
       const blogPost = document.createElement("div");
       blogPost.classList.add(
         "bg-white",
@@ -62,14 +69,32 @@ async function fetchBlogs() {
       blogPost.appendChild(body);
       blogContainer.appendChild(blogPost);
     });
+
+    document.getElementById("current-page").textContent = currentPage;
+
+    document.getElementById("prev-page").disabled = currentPage === 1;
+    document.getElementById("next-page").disabled = currentPage === totalPages;
   } catch (error) {
     console.error("Error fetching blogs:", error);
+  }
+}
+// handle pagination---
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    fetchBlogs();
+  }
+}
+function nextPage() {
+  if (currentPage < totalPages) {
+    currentPage++;
+    fetchBlogs();
   }
 }
 
 async function fetchBlogDetails() {
   const urlParams = new URLSearchParams(window.location.search);
-  const blogId = urlParams.get("id"); 
+  const blogId = urlParams.get("id");
 
   try {
     const response = await fetch(`https://dev.to/api/articles/${blogId}`);
@@ -90,8 +115,8 @@ async function fetchBlogDetails() {
   }
 }
 
-
-
-fetchBlogs();
-fetchBlogDetails();
-
+if (window.location.pathname.includes("blog-detail.html")) {
+  fetchBlogDetails();
+} else {
+  fetchBlogs();
+}

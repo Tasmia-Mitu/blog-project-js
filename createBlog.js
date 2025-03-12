@@ -3,7 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const form = document.getElementById("create-post");
   form.addEventListener("submit", (evt) => createBlogPost(evt));
+
+  // // pagination--
+  // document.getElementById("prev-page").disabled = currentPage===1;
+  // document.getElementById("next-page").disabled = currentPage === totalPages;
+
 });
+
+
+let currentPage = 1;
+const limit = 6;
+const totalPages = 5;
 
 async function fetchUsers() {
   const blogContainer = document.getElementById("blog-container");
@@ -24,9 +34,18 @@ async function fetchUsers() {
       "p-5"
     );
 
-    blogs.slice(0, 15).forEach((blog) => {
+    const start = (currentPage - 1) * limit;
+    const end = currentPage * limit;
+    blogs.slice(start, end).forEach((blog) => {
       displayBlogPost(blog.id, blog.title, blog.body, blogContainer);
     });
+
+    document.getElementById("current-page").textContent = currentPage;
+
+    // Update disabled state for pagination buttons
+    document.getElementById("prev-page").disabled = currentPage === 1;
+    document.getElementById("next-page").disabled = currentPage === totalPages;
+
   } catch (error) {
     console.error("Error fetching blog posts:", error);
     blogContainer.innerHTML = `<p class="text-red-500">Faild to load blog posts.</p>`;
@@ -166,27 +185,104 @@ async function deleteBlogPost(id, blogPost){
   }
 }
 
+
+// upfate edit uii--
 async function editBlogPost(id, oldTitle, oldBody, blogPost) {
-  const newTitle = prompt("Enter new title:", oldTitle);
-  const newBody = prompt("Enter new description:", oldBody);
+  // Swal এর মধ্যে কাস্টম HTML তৈরি করবো
+  Swal.fire({
+    title: "Edit Blog Post",
+    html: `
+      <div class="w-[600px] p-6 bg-white shadow-xl rounded-lg">
+        <label class="block text-lg font-medium text-gray-700 mb-1">Title:</label>
+        <input id="edit-title" type="text" value="${oldTitle}" 
+          class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
 
-  if (!newTitle || !newBody) return;
+        <label class="block text-lg font-medium text-gray-700 mb-1">Description:</label>
+        <textarea id="edit-body" 
+          class="w-full h-40 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">${oldBody}</textarea>
 
-  try {
-    await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTitle, body: newBody, userId: 1 }),
-    });
+        <div class="flex justify-end gap-3 mt-5">
+          <button id="cancel-btn" class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500">Cancel</button>
+          <button id="save-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+        </div>
+      </div>
+    `,
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    didOpen: () => {
+      // Cancel 
+      document.getElementById("cancel-btn").addEventListener("click", () => Swal.close());
 
-    alert("Blog post updated successfully!"); // Simple Success Message
+      // Save 
+      document.getElementById("save-btn").addEventListener("click", async () => {
+        const title = document.getElementById("edit-title").value;
+        const body = document.getElementById("edit-body").value;
 
-    // **UI Update ✅**
-    blogPost.querySelector("h2").textContent = newTitle;
-    blogPost.querySelector("p").textContent = newBody;
-  } catch (error) {
-    alert("Failed to update the blog post."); // Error Message
+        if (!title || !body) {
+          Swal.fire("Warning", "Title & Description cannot be empty!", "warning");
+          return;
+        }
+
+        try {
+          await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title, body, userId: 1 }),
+          });
+
+          Swal.fire("Updated!", "The blog post has been updated.", "success");
+
+          // UI Update 
+          blogPost.querySelector("h2").textContent = title;
+          blogPost.querySelector("p").textContent = body;
+        } catch (error) {
+          Swal.fire("Failed!", "Could not update the blog post.", "error");
+        }
+      });
+    },
+  });
+}
+
+// Handle previous page
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    fetchUsers(currentPage);
   }
 }
+
+// Handle next page
+function nextPage() {
+  if (currentPage < totalPages) {
+    currentPage++;
+    fetchUsers(currentPage);
+  }
+}
+
+
+
+// edit blogg
+// async function editBlogPost(id, oldTitle, oldBody, blogPost) {
+//   const newTitle = prompt("Enter new title:", oldTitle);
+//   const newBody = prompt("Enter new description:", oldBody);
+
+//   if (!newTitle || !newBody) return;
+
+//   try {
+//     await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+//       method: "PUT",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ title: newTitle, body: newBody, userId: 1 }),
+//     });
+
+//     alert("Blog post updated successfully!"); // Simple Success Message
+
+//     // **UI Update ✅**
+//     blogPost.querySelector("h2").textContent = newTitle;
+//     blogPost.querySelector("p").textContent = newBody;
+//   } catch (error) {
+//     alert("Failed to update the blog post."); // Error Message
+//   }
+// }
 
 

@@ -36,6 +36,25 @@
             <!-- Blog posts will be displayed here -->
         </div>
     </div>
+
+    <!-- pagination buttonn -->
+    <div class="flex justify-center space-x-3 mt-6">
+        <button onclick="prevPage()" id="prev-page" class="px-4 py-2 bg-gray-300 rounded">Previous</button>
+        <span id="current-page" class="px-4 py-2 bg-blue-500 text-white rounded">1</span>
+        <button onclick="nextPage()" id="next-page" class="px-4 py-2 bg-gray-300 rounded">Next</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-10">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 My Blog. All Rights Reserved.</p>
+            <ul class="flex justify-center space-x-6 mt-4">
+                <li><a href="#" class="text-white hover:text-blue-500">Facebook</a></li>
+                <li><a href="#" class="text-white hover:text-blue-500">Twitter</a></li>
+                <li><a href="#" class="text-white hover:text-blue-500">Instagram</a></li>
+            </ul>
+        </div>
+    </footer>
     
 
     <script src="createBlog.js"></script>
